@@ -6,6 +6,7 @@ from playsound import playsound as ps
 from threading import Thread
 from time import sleep
 import signal
+from random import randint
 
 
 tz_IN = pytz.timezone('Asia/Kolkata')
@@ -13,7 +14,7 @@ dt_IN = dt.now(tz_IN)
 
 t = dt_IN.hour
 interrupted = False
-state = 0 
+state = 0
 # 1 - "bottle picked"
 # 2 - "bottle placed"
 
@@ -29,13 +30,14 @@ def sensorDataRead():
 	print("data read complete")
 
 def playAudio(s):
-	r = random.randrange(1, 8, 1)
+	r1 = randint(0, 9)
+
 	if s == "drink":
-		playsound("")
+		ps(str(r1)+".mp3")
 	elif s == "refill":
-		playsound("")
+		ps(str(r1)+".mp3")
 	elif s == "place":
-		playsound("")
+		ps(str(r1)+".mp3")
 
 def drink():
 
@@ -51,21 +53,21 @@ def drink():
 		playAudio("place")
 
 	if bottleEmpty:
-		refillBott()		
-	
+		refillBott()
+
 
 def refillBott():
 	print("Refill Bottle")
 	playAudio("refill")
 	while state != 1:
-		time.sleep(1)
+		time.sleep(5)
 		playAudio("refill")
-	time.sleep(150)
+	time.sleep(500)
 	while state != 2:
 		time.sleep(5)
 		playAudio("place")
 
-	if not bottleFull:
+	if bottleEmpty:
 		refillBott()
 
 
@@ -74,7 +76,9 @@ def job():
 	return
 
 def startHourly():
-	s.every().hours.tag("hourly").do(job)
+    print("hourly started")
+	# s.every().hours.tag("hourly").do(job)
+    s.every(10).seconds.tag("hourly").do(job)
 
 def stopHourly():
 	s.clear("hourly")
@@ -89,15 +93,17 @@ signal.signal(signal.SIGINT, signal_handler)
 # capture SIGINT signal, e.g., Ctrl+C
 
 # if t > 5:
-# 	s.every().day.at(str(t+1)+":00").do(startHourly)	
+# 	s.every().day.at(str(t+1)+":00").do(startHourly)
 
+
+s.every().day.at("00:28").do(startHourly)
 
 # s.every().day.at("05:00").do(startHourly)
 # s.every().day.at("21:00").do(stopHourly)
 
 
+
 while not interrupted:
-	sensorDataRead()
+	# sensorDataRead()
 	s.run_pending()
 	time.sleep(1)
-
