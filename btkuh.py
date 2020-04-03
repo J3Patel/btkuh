@@ -29,6 +29,7 @@ def sensorDataRead():
 	print("data read complete")
 
 def playAudio(s):
+	r = random.randrange(1, 8, 1)
 	if s == "drink":
 		playsound("")
 	elif s == "refill":
